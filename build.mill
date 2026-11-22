@@ -1,0 +1,50 @@
+package build
+
+import mill.*
+import mill.constants.BuildInfo.{millBinPlatform, millVersion}
+import mill.scalalib.*
+import mill.scalalib.publish.*
+import mill.scalalib.scalafmt.*
+import mill.util.VcsVersion
+
+object `package` extends ScalaModule with SonatypeCentralPublishModule with ScalafmtModule {
+  // The Scala that Mill 1.3 compiles build files and its own libraries with. A newer one would write TASTy that those
+  // builds can't read
+  override def scalaVersion = "3.9.0"
+
+  override def artifactName = "millmodulegraph"
+
+  override def platformSuffix = s"_mill$millBinPlatform"
+
+  override def publishVersion: T[String] =
+    VcsVersion.vcsState().format(dirtyHashDigits = 0, untaggedSuffix = "-SNAPSHOT")
+
+  override def pomSettings = PomSettings(
+    description = "Draws a Mill build's module dependency graph",
+    organization = "io.github.nafg.millmodulegraph",
+    url = "https://github.com/nafg/mill-module-graph",
+    licenses = Seq(License.`Apache-2.0`),
+    versionControl = VersionControl.github(owner = "nafg", repo = "mill-module-graph"),
+    developers = Seq(Developer("nafg", "Naftoli Gugenheim", "https://github.com/nafg"))
+  )
+
+  override def scalacOptions = Seq("-Wunused:all", "-deprecation")
+
+  override def compileMvnDeps = Seq(mvn"com.lihaoyi::mill-libs:$millVersion")
+
+  override def mvnDeps = Seq(
+    mvn"net.sourceforge.plantuml:plantuml-mit:1.2026.10",
+    mvn"org.eclipse.elk:org.eclipse.elk.alg.layered:0.12.1",
+    // Needed at runtime by ELK but missing from its POM (https://github.com/eclipse-elk/elk/issues/1176). Newer
+    // versions need Java 21
+    mvn"org.eclipse.xtext:org.eclipse.xtext.xbase.lib:2.40.0"
+  )
+
+  object test extends ScalaTests with TestModule.Munit {
+    override def mvnDeps = Seq(
+      mvn"com.lihaoyi::mill-libs:$millVersion",
+      mvn"com.lihaoyi::mill-testkit:$millVersion",
+      mvn"org.scalameta::munit:1.3.6"
+    )
+  }
+}
