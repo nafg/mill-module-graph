@@ -41,7 +41,7 @@ object moduleGraph extends ModuleGraphModule {
 Then run
 
 ```sh
-./mill moduleGraph.moduleGraph
+./mill moduleGraph
 ```
 
 and the files are written to `out/moduleGraph/moduleGraph.dest/`.
