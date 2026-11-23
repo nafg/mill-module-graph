@@ -1,10 +1,12 @@
 package io.github.nafg.millmodulegraph
 
 import mill.*
-import mill.api.Module
+import mill.api.{DefaultTaskModule, Module}
 
-/** Draws the graph of a build's modules and their `moduleDeps` */
-trait ModuleGraphModule extends Module {
+/** Draws the graph of a build's modules and their `moduleDeps`. Its default task is [[moduleGraph]]. */
+trait ModuleGraphModule extends DefaultTaskModule {
+
+  override def defaultTask(): String = "moduleGraph"
 
   /** The modules drawn, with the modules under them. To draw the whole build from a module other than the root,
     * override this with `build.moduleDirectChildren`.
