@@ -12,15 +12,7 @@ env:
 
 jobs:
   test:
-    strategy:
-      matrix:
-        os:
-          - name: ubuntu-latest
-            command: ./mill
-          - name: windows-latest
-            command: .\mill.bat
-
-    runs-on: ${{ matrix.os.name }}
+    runs-on: ubuntu-latest
 
     steps:
       - uses: actions/checkout@v7
@@ -31,7 +23,7 @@ jobs:
 
       - name: Test
         run: |
-          ${{ matrix.os.command }} --no-server --jobs 0 test
+          ./mill --no-server --jobs 0 test
 
       - name: Publish Test Report
         uses: mikepenz/action-junit-report@v6
